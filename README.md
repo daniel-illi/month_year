@@ -8,6 +8,7 @@ Inspired by a [blog post](blog post) by [Robert Pankowecki](https://github.com/p
 
 [![Build Status](https://travis-ci.org/daniel-illi/month_year.svg?branch=master)](https://travis-ci.org/daniel-illi/month_year)
 [![Coverage Status](https://coveralls.io/repos/github/daniel-illi/month_year/badge.svg?branch=master)](https://coveralls.io/github/daniel-illi/month_year?branch=master)
+[![Gem Version](https://badge.fury.io/rb/month_year.svg)](https://badge.fury.io/rb/month_year)
 
 ## Installation
 
