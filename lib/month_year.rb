@@ -51,7 +51,7 @@ class MonthYear
   end
 
   def ==(other)
-    other.class == self.class && (self <=> other) == 0
+    self.class == other.class && (self <=> other) == 0
   end
   alias_method :eql?, :==
 
@@ -89,30 +89,26 @@ class MonthYear
   #   => "2016-12"
   #
   def to_s
-    "#{year}-#{month}"
-  end
-
-  protected
-
-  def state
-    [year, month]
+    "#{year}-#{month.to_s.rjust(2, '0')}"
   end
 
   private
 
-  def active_record?
-    Object.const_defined?(::ActiveRecord::SerializationTypeMismatch)
-  end
+  class << self
+    def active_record?
+      Object.const_defined?("::ActiveRecord::SerializationTypeMismatch")
+    end
 
-  def argument_error_class
-    active_record? ? ::ActiveRecord::SerializationTypeMismatch : ArgumentError
-  end
+    def argument_error_class
+      active_record? ? ::ActiveRecord::SerializationTypeMismatch : ArgumentError
+    end
 
-  def throw_load_error(obj)
-    raise argument_error_class, "Argument was supposed to be an Integer, but was a #{obj.class}. -- #{obj.inspect}"
-  end
+    def raise_load_error(obj)
+      raise argument_error_class, "Argument was supposed to be an Integer, but was a #{obj.class}. -- #{obj.inspect}"
+    end
 
-  def throw_dump_error(obj)
-    raise argument_error_class, "Argument was supposed to be a #{self}, but was a #{obj.class}. -- #{obj.inspect}"
+    def raise_dump_error(obj)
+      raise argument_error_class, "Argument was supposed to be a #{self}, but was a #{obj.class}. -- #{obj.inspect}"
+    end
   end
 end
