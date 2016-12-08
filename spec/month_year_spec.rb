@@ -47,7 +47,23 @@ describe MonthYear do
     end
   end
 
-  it '#new' # trows
+  context '#new' do
+    it 'raises ArgumentError when arguments are not Integer' do
+      expect { MonthYear.new(2000, "5") }.to raise_error(ArgumentError)
+      expect { MonthYear.new("2000", 5) }.to raise_error(ArgumentError)
+    end
+
+    it 'raises ArgumentError when month argument is not in 1..12' do
+      expect { MonthYear.new(2000, 0)}.to raise_error(ArgumentError)
+      expect { MonthYear.new(2000, 13)}.to raise_error(ArgumentError)
+    end
+
+    it 'initializes correct year and month attributes' do
+      new_instance = MonthYear.new(month_year.year, month_year.month)
+      expect(new_instance.year).to eq(month_year.year)
+      expect(new_instance.month).to eq(month_year.month)
+    end
+  end
 
   it '#to_i returns number with format YYYYMM' do
     expect(month_year.to_i).to eq(200102)
@@ -83,16 +99,29 @@ describe MonthYear do
     expect(MonthYear.instance_method(:==)).to eq(MonthYear.instance_method(:eql?))
   end
 
+  it '#succ returns the MonthYear after the current one' do
+    expect(month_year.succ).to eq(MonthYear.new(month_year.year, month_year.month + 1))
+  end
+
+  it '#next and #succ are the same' do
+    expect(MonthYear.instance_method(:next)).to eq(MonthYear.instance_method(:succ))
+  end
+
   context '#<=>' do
     it 'returns 0 for same year and month' do
-      expect(month_year <=> MonthYear.new(month_year.year, month_year.month)).to eql(0)
+      expect(month_year <=> MonthYear.new(month_year.year, month_year.month)).to eq(0)
     end
 
-    it 'returns -1 when...'
-    it 'returns 1 when...'
-  end
-  it '#succ'
-  it '#next'
+    it 'returns -1 when argument is later' do
+      expect(month_year <=> MonthYear.new(month_year.year, month_year.month + 1)).to eq(-1)
+    end
 
-  it '#hash'
+    it 'returns 1 when argument is earlier' do
+      expect(month_year <=> MonthYear.new(month_year.year, month_year.month - 1)).to eq(1)
+    end
+  end
+
+  it '#hash returns the same value as #to_i.hash' do
+    expect(month_year.hash).to eq(month_year.to_i.hash)
+  end
 end
