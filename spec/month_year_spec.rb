@@ -7,7 +7,7 @@ require 'pry'
 describe MonthYear do
   let(:date){ Date.new(2001, 2, 3) }
   let(:time){ Time.new(2001, 2, 3, 4, 5, 6, "+01:00") }
-  let(:month_year){ MonthYear.new(2001, 2) }
+  let(:month_year){ MonthYear.new(2, 2001) }
 
   context "::from_date" do
     it 'instantiates with date argument' do
@@ -49,19 +49,19 @@ describe MonthYear do
 
   context '#new' do
     it 'raises ArgumentError when arguments are not Integer' do
-      expect { MonthYear.new(2000, "5") }.to raise_error(ArgumentError)
-      expect { MonthYear.new("2000", 5) }.to raise_error(ArgumentError)
+      expect { MonthYear.new("5", 2000) }.to raise_error(ArgumentError)
+      expect { MonthYear.new(5, "2000") }.to raise_error(ArgumentError)
     end
 
     it 'raises ArgumentError when month argument is not in 1..12' do
-      expect { MonthYear.new(2000, 0)}.to raise_error(ArgumentError)
-      expect { MonthYear.new(2000, 13)}.to raise_error(ArgumentError)
+      expect { MonthYear.new(0, 2000)}.to raise_error(ArgumentError)
+      expect { MonthYear.new(13, 2000)}.to raise_error(ArgumentError)
     end
 
     it 'initializes correct year and month attributes' do
-      new_instance = MonthYear.new(month_year.year, month_year.month)
-      expect(new_instance.year).to eq(month_year.year)
+      new_instance = MonthYear.new(month_year.month, month_year.year)
       expect(new_instance.month).to eq(month_year.month)
+      expect(new_instance.year).to eq(month_year.year)
     end
   end
 
@@ -83,15 +83,15 @@ describe MonthYear do
 
   context '#==' do
     it 'returns false for same year but different month' do
-      expect(month_year).not_to eql(MonthYear.new(month_year.year, month_year.month + 1))
+      expect(month_year).not_to eql(MonthYear.new(month_year.month + 1, month_year.year))
     end
 
     it 'returns false for same month but different year' do
-      expect(month_year).not_to eql(MonthYear.new(month_year.year + 1, month_year.month))
+      expect(month_year).not_to eql(MonthYear.new(month_year.month, month_year.year + 1))
     end
 
     it 'returns true for same year and month' do
-      expect(month_year).to eql(MonthYear.new(month_year.year, month_year.month))
+      expect(month_year).to eql(MonthYear.new(month_year.month, month_year.year))
     end
   end
 
@@ -100,7 +100,7 @@ describe MonthYear do
   end
 
   it '#succ returns the MonthYear after the current one' do
-    expect(month_year.succ).to eq(MonthYear.new(month_year.year, month_year.month + 1))
+    expect(month_year.succ).to eq(MonthYear.new(month_year.month + 1, month_year.year))
   end
 
   it '#next and #succ are the same' do
@@ -109,15 +109,15 @@ describe MonthYear do
 
   context '#<=>' do
     it 'returns 0 for same year and month' do
-      expect(month_year <=> MonthYear.new(month_year.year, month_year.month)).to eq(0)
+      expect(month_year <=> MonthYear.new(month_year.month, month_year.year)).to eq(0)
     end
 
     it 'returns -1 when argument is later' do
-      expect(month_year <=> MonthYear.new(month_year.year, month_year.month + 1)).to eq(-1)
+      expect(month_year <=> MonthYear.new(month_year.month + 1, month_year.year)).to eq(-1)
     end
 
     it 'returns 1 when argument is earlier' do
-      expect(month_year <=> MonthYear.new(month_year.year, month_year.month - 1)).to eq(1)
+      expect(month_year <=> MonthYear.new(month_year.month - 1, month_year.year)).to eq(1)
     end
   end
 

@@ -2,7 +2,7 @@ require 'month_year/version'
 
 class MonthYear
 
-  attr_reader :year, :month
+  attr_reader :month, :year
 
   class << self
     # Instantiate a `MonthYear` object from a `Date`-like object
@@ -18,14 +18,14 @@ class MonthYear
     #
     def from_date(date)
       raise ArgumentError unless [:year, :month].all? {|v| date.respond_to?(v) }
-      self.new(date.year, date.month)
+      self.new(date.month, date.year)
     end
 
     def load(month_year)
       raise_load_error(month_year) unless month_year.is_a?(Integer)
-      year = month_year / 100
       month = month_year % 100
-      self.new(year, month)
+      year = month_year / 100
+      self.new(month, year)
     end
 
     def dump(month_year)
@@ -37,17 +37,17 @@ class MonthYear
   # Instantiate a new `MonthYear` object.
   #
   # Example:
-  #   >> MonthYear.new(2016, 12)
+  #   >> MonthYear.new(12, 2016)
   #   => #<MonthYear:0x00000001f15c10 @month=12, @year=2016>
   #
   # Arguments:
-  #   year: (Integer)
   #   month: (Integer)
+  #   year: (Integer)
   #
-  def initialize(year, month)
-    raise ArgumentError unless [year, month].all? {|v| Fixnum === v }
-    raise ArgumentError unless (1..12).cover?(month)
-    @year, @month = year, month
+  def initialize(month, year)
+    raise ArgumentError.new("arguments must be integers") unless [month, year].all? {|v| Fixnum === v }
+    raise ArgumentError.new("month argument must be between 1 and 12") unless (1..12).cover?(month)
+    @month, @year = month, year
   end
 
   def ==(other)
@@ -65,9 +65,9 @@ class MonthYear
 
   def succ
     if month == 12
-      self.class.new(year+1, 1)
+      self.class.new(1, year + 1)
     else
-      self.class.new(year, month+1)
+      self.class.new(month + 1, year)
     end
   end
   alias_method :next, :succ
@@ -75,7 +75,7 @@ class MonthYear
   # Return the numeric representation of this `MonthYear` instance.
   #
   # Example:
-  #   >> MonthYear.new(2016, 12).to_i
+  #   >> MonthYear.new(12, 2016).to_i
   #   => 201612
   #
   def to_i
@@ -85,7 +85,7 @@ class MonthYear
   # Return the string representation of this `MonthYear` instance.
   #
   # Example:
-  #   >> MonthYear.new(2016, 12).to_s
+  #   >> MonthYear.new(12, 2016).to_s
   #   => "2016-12"
   #
   def to_s
@@ -95,12 +95,12 @@ class MonthYear
   private
 
   class << self
-    def active_record?
-      Object.const_defined?("::ActiveRecord::SerializationTypeMismatch")
+    def raise_active_record_error?
+      ! (Object.const_get("::ActiveRecord::SerializationTypeMismatch") rescue nil).nil?
     end
 
     def argument_error_class
-      active_record? ? ::ActiveRecord::SerializationTypeMismatch : ArgumentError
+      raise_active_record_error? ? ::ActiveRecord::SerializationTypeMismatch : ArgumentError
     end
 
     def raise_load_error(obj)
